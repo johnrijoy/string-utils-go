@@ -26,3 +26,4 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
+          args: release --rm-dist
