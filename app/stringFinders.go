@@ -24,16 +24,16 @@ func FindAllFromFile(regexExp string, filePath string) (occurrenceList []string)
 	return
 }
 
-func FindAllFromGlobPattern(regexExp string, globPattern string) (occurrenceMap map[string][]string) {
+func FindAllFromGlobPattern(regexExp string, globPatterns []string) (occurrenceMap map[string][]string) {
 
-	fileNames := utils.FindFilesFromGlobPattern(globPattern)
+	fileNamesList := utils.FindFilesFromGlobPatterns(globPatterns)
 
 	r, err := regexp.Compile(regexExp)
 	utils.HandlePanic(err)
 
 	occurrenceMap = make(map[string][]string)
 
-	for _, fileName := range fileNames {
+	for _, fileName := range fileNamesList {
 
 		var occurrenceList []string
 
@@ -50,16 +50,16 @@ func FindAllFromGlobPattern(regexExp string, globPattern string) (occurrenceMap 
 	return
 }
 
-func FindAllSubmatchFromGlobPattern(regexExp string, globPattern string) map[string][][]string {
+func FindAllSubmatchFromGlobPattern(regexExp string, globPatterns []string) map[string][][]string {
 
-	fileNames := utils.FindFilesFromGlobPattern(globPattern)
+	fileNamesList := utils.FindFilesFromGlobPatterns(globPatterns)
 
 	r, err := regexp.Compile(regexExp)
 	utils.HandlePanic(err)
 
 	occurrenceMap := make(map[string][][]string)
 
-	for _, fileName := range fileNames {
+	for _, fileName := range fileNamesList {
 
 		var occurrenceList [][]string
 

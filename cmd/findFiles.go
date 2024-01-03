@@ -12,17 +12,25 @@ import (
 
 // findFilesCmd represents the findFiles command
 var findFilesCmd = &cobra.Command{
-	Use:   "findFiles",
+	Use:   "findFiles filePath",
 	Short: "Command to check all files that match the pattern",
 	Long:  `Command to check all files that match the pattern`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 
+		fmt.Println("File Pattern: ", filePathList)
+
 		filePath := args[0]
 
-		fmt.Println("File Pattern: ", filePath)
+		if isInputPathFileMode {
+			fmt.Println("File Path Mode: Input Path File")
+			filePathList = utils.ReadInputPathFile(filePath)
+		} else {
+			fmt.Println("File Path Mode: Single")
+			filePathList = append(filePathList, filePath)
+		}
 
-		resultList := utils.FindFilesFromGlobPattern(filePath)
+		resultList := utils.FindFilesFromGlobPatterns(filePathList)
 
 		for _, result := range resultList {
 			fmt.Println(result)
@@ -35,13 +43,5 @@ var findFilesCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(findFilesCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// findFilesCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// findFilesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// Flags and configuration settings
 }

@@ -8,7 +8,7 @@ import (
 	"example.com/user/string-utils/utils"
 )
 
-func ResplaceAllInFile(regexExp, filePath, replaceText string) (occurrenceList []string) {
+func ReplaceAllInFile(regexExp, filePath, replaceText string) (occurrenceList []string) {
 
 	r, err := regexp.Compile(regexExp)
 	utils.HandlePanic(err)
@@ -34,7 +34,7 @@ func ResplaceAllInFile(regexExp, filePath, replaceText string) (occurrenceList [
 	return
 }
 
-func ResplaceAllInGlobPattern(regexExp, globPattern, replaceText string) (occurrenceMap map[string][]string) {
+func ReplaceAllInGlobPattern(regexExp, globPattern, replaceText string, templateMode bool) (occurrenceMap map[string][]string) {
 
 	fileNames := utils.FindFilesFromGlobPattern(globPattern)
 
@@ -46,6 +46,7 @@ func ResplaceAllInGlobPattern(regexExp, globPattern, replaceText string) (occurr
 	for _, fileName := range fileNames {
 
 		var occurrenceList []string
+		var newFile []byte
 
 		file, err := os.ReadFile(fileName)
 		utils.HandlePanic(err)
@@ -56,11 +57,17 @@ func ResplaceAllInGlobPattern(regexExp, globPattern, replaceText string) (occurr
 			occurrenceMap[fileName] = occurrenceList
 		}
 
-		// to convert escape characters
-		replaceText, err = strconv.Unquote(`"` + replaceText + `"`)
-		utils.HandlePanic(err)
+		if templateMode {
+			replaceTemplate, err := os.ReadFile(replaceText)
+			utils.HandlePanic(err)
+			newFile = r.ReplaceAllLiteral(file, replaceTemplate)
+		} else {
+			// to convert escape characters
+			replaceText, err = strconv.Unquote(`"` + replaceText + `"`)
+			utils.HandlePanic(err)
 
-		newFile := r.ReplaceAllLiteral(file, []byte(replaceText))
+			newFile = r.ReplaceAllLiteral(file, []byte(replaceText))
+		}
 
 		err = os.WriteFile(fileName, newFile, 0644)
 		utils.HandlePanic(err)
@@ -69,7 +76,7 @@ func ResplaceAllInGlobPattern(regexExp, globPattern, replaceText string) (occurr
 	return
 }
 
-func ResplaceAllSubmatchesInGlobPattern(regexExp, globPattern, replaceText string) map[string][][]string {
+func ReplaceAllSubmatchesInGlobPattern(regexExp, globPattern, replaceText string, templateMode bool) map[string][][]string {
 
 	fileNames := utils.FindFilesFromGlobPattern(globPattern)
 
@@ -81,15 +88,106 @@ func ResplaceAllSubmatchesInGlobPattern(regexExp, globPattern, replaceText strin
 	for _, fileName := range fileNames {
 
 		var occurrenceList [][]string
+		var newFile []byte
 
 		file, err := os.ReadFile(fileName)
 		utils.HandlePanic(err)
 
-		// to convert escape characters
-		replaceText, err = strconv.Unquote(`"` + replaceText + `"`)
+		if templateMode {
+			replaceTemplate, err := os.ReadFile(replaceText)
+			utils.HandlePanic(err)
+			newFile = r.ReplaceAll(file, replaceTemplate)
+		} else {
+			// to convert escape characters
+			replaceText, err = strconv.Unquote(`"` + replaceText + `"`)
+			utils.HandlePanic(err)
+
+			newFile = r.ReplaceAll(file, []byte(replaceText))
+		}
+
+		// get list of changes with replacement
+		occurrenceList = getChangeList(r, file, newFile, occurrenceList)
+		if len(occurrenceList) != 0 {
+			occurrenceMap[fileName] = occurrenceList
+		}
+
+		err = os.WriteFile(fileName, newFile, 0644)
+		utils.HandlePanic(err)
+	}
+
+	return occurrenceMap
+}
+
+func ReplaceAllInGlobPatterns(regexExp string, globPatterns []string, replaceText string, templateMode bool) (occurrenceMap map[string][]string) {
+
+	fileNames := utils.FindFilesFromGlobPatterns(globPatterns)
+
+	r, err := regexp.Compile(regexExp)
+	utils.HandlePanic(err)
+
+	occurrenceMap = make(map[string][]string)
+
+	for _, fileName := range fileNames {
+
+		var occurrenceList []string
+		var newFile []byte
+
+		file, err := os.ReadFile(fileName)
 		utils.HandlePanic(err)
 
-		newFile := r.ReplaceAll(file, []byte(replaceText))
+		occurrenceList = findMatches(r, file, occurrenceList)
+
+		if len(occurrenceList) != 0 {
+			occurrenceMap[fileName] = occurrenceList
+		}
+
+		if templateMode {
+			replaceTemplate, err := os.ReadFile(replaceText)
+			utils.HandlePanic(err)
+			newFile = r.ReplaceAllLiteral(file, replaceTemplate)
+		} else {
+			// to convert escape characters
+			replaceText, err = strconv.Unquote(`"` + replaceText + `"`)
+			utils.HandlePanic(err)
+
+			newFile = r.ReplaceAllLiteral(file, []byte(replaceText))
+		}
+
+		err = os.WriteFile(fileName, newFile, 0644)
+		utils.HandlePanic(err)
+	}
+
+	return
+}
+
+func ReplaceAllSubmatchesInGlobPatterns(regexExp string, globPatterns []string, replaceText string, templateMode bool) map[string][][]string {
+
+	fileNames := utils.FindFilesFromGlobPatterns(globPatterns)
+
+	r, err := regexp.Compile(regexExp)
+	utils.HandlePanic(err)
+
+	occurrenceMap := make(map[string][][]string)
+
+	for _, fileName := range fileNames {
+
+		var occurrenceList [][]string
+		var newFile []byte
+
+		file, err := os.ReadFile(fileName)
+		utils.HandlePanic(err)
+
+		if templateMode {
+			replaceTemplate, err := os.ReadFile(replaceText)
+			utils.HandlePanic(err)
+			newFile = r.ReplaceAll(file, replaceTemplate)
+		} else {
+			// to convert escape characters
+			replaceText, err = strconv.Unquote(`"` + replaceText + `"`)
+			utils.HandlePanic(err)
+
+			newFile = r.ReplaceAll(file, []byte(replaceText))
+		}
 
 		// get list of changes with replacement
 		occurrenceList = getChangeList(r, file, newFile, occurrenceList)

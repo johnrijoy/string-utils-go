@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -15,6 +16,15 @@ func FindFilesFromGlobPattern(globPattern string) (fileList []string) {
 	HandlePanic(err)
 
 	fileList = filterFiles(fileList)
+
+	return
+}
+
+func FindFilesFromGlobPatterns(globPatterns []string) (fileList []string) {
+
+	for _, glglobPattern := range globPatterns {
+		fileList = append(fileList, FindFilesFromGlobPattern(glglobPattern)...)
+	}
 
 	return
 }
@@ -44,6 +54,22 @@ func FindFilesFromPathPattern(pathPattern string) (fileList []string) {
 	HandlePanic(err)
 
 	return
+}
+
+func ReadInputPathFile(inputFile string) []string {
+	var filePathList []string
+
+	file, err := os.Open(inputFile)
+	HandlePanic(err)
+	defer file.Close()
+
+	fileScanner := bufio.NewScanner(file)
+	fileScanner.Split(bufio.ScanLines)
+	for fileScanner.Scan() {
+		filePathList = append(filePathList, fileScanner.Text())
+	}
+
+	return filePathList
 }
 
 func filterFiles(pathList []string) (resultList []string) {
