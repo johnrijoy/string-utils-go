@@ -17,9 +17,10 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "string-utils",
-	Short: "Contains common utility functions for maniupulating strings",
-	Long:  `A utility for manipulating strings inside files`,
+	Use:     "string-utils",
+	Version: "A0.0.0",
+	Short:   "Contains common utility functions for maniupulating strings",
+	Long:    `A utility for manipulating strings inside files`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
