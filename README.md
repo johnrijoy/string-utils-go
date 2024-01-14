@@ -1,20 +1,20 @@
-# String utils Cli
+# String utils Cli - GoSu
 
- A Go Cli which can manipulate string inside files
+ A Go Cli which can manipulate text inside files
 
 ## Commands
 
 - Find Files
   
-    `string-utils findFiles filePath [-f filePath]`
+    `string-utils findFiles filePath [-f filePath] [-o outputFile]`
 
 - Find text
 
-    `string-utils regex filePath [-s] [-f filePath]`
+    `string-utils regex filePath [-s] [-f filePath] [-o outputFile]`
 
 - Replace text
   
-    `string-utils replaceAll regex replaceText filePath [-s|t] [-f filePath]`
+    `string-utils replaceAll regex replaceText filePath [-s|t] [-f filePath] [-o outputFile]`
 
 ## Sample Commands
 
