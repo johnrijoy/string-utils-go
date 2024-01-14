@@ -27,16 +27,16 @@ var replaceAllCmd = &cobra.Command{
 		filePath := args[2]
 
 		if isInputPathFileMode {
-			fmt.Println("File Path Mode: Input Path File")
+			utils.InfoLn("File Path Mode: Input Path File")
 			filePathList = utils.ReadInputPathFile(filePath)
 		} else {
-			fmt.Println("File Path Mode: Single")
+			utils.InfoLn("File Path Mode: Single")
 			filePathList = append(filePathList, filePath)
 		}
 
-		fmt.Println("Regex: ", regexExp)
-		fmt.Println("File: ", filePathList)
-		fmt.Println("Replace Text: ", replaceText)
+		utils.InfoLn("Regex: ", regexExp)
+		utils.InfoLn("File: ", filePathList)
+		utils.InfoLn("Replace Text: ", replaceText)
 
 		if !submatchFlag {
 			resultList := app.ReplaceAllInGlobPatterns(regexExp, filePathList, replaceText, isTemplateMode)
@@ -46,7 +46,7 @@ var replaceAllCmd = &cobra.Command{
 			utils.PrintSubmatchMap(resultList)
 		}
 
-		fmt.Println("replaceAll End")
+		utils.DebugLn("replaceAll End")
 	},
 }
 

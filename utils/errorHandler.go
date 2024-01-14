@@ -1,10 +1,18 @@
 package utils
 
-import "fmt"
+import "os"
 
 func HandlePanic(err error) {
 	if err != nil {
-		fmt.Println("Eoncountered error: ", err)
+		ErrorLn(err)
 		panic(err)
+	}
+}
+
+func HandleExit(err error) {
+	if err != nil {
+		ErrorLn(err)
+		ErrorLn("Exiting ...")
+		os.Exit(1)
 	}
 }

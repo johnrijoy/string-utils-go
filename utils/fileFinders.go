@@ -12,8 +12,11 @@ import (
 
 func FindFilesFromGlobPattern(globPattern string) (fileList []string) {
 
+	DebugLn("GlobPattern: ", globPattern)
 	fileList, err := doublestar.Glob(globPattern)
 	HandlePanic(err)
+
+	DebugLn("Files: ", fileList)
 
 	fileList = filterFiles(fileList)
 

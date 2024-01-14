@@ -4,8 +4,6 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
 	"example.com/user/string-utils/utils"
 	"github.com/spf13/cobra"
 )
@@ -17,26 +15,27 @@ var findFilesCmd = &cobra.Command{
 	Long:  `Command to check all files that match the pattern`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		utils.DebugLn("findFiles called")
 
-		fmt.Println("File Pattern: ", filePathList)
+		utils.InfoLn("File Pattern: ", filePathList)
 
 		filePath := args[0]
 
 		if isInputPathFileMode {
-			fmt.Println("File Path Mode: Input Path File")
+			utils.InfoLn("File Path Mode: Input Path File")
 			filePathList = utils.ReadInputPathFile(filePath)
 		} else {
-			fmt.Println("File Path Mode: Single")
+			utils.InfoLn("File Path Mode: Single")
 			filePathList = append(filePathList, filePath)
 		}
 
 		resultList := utils.FindFilesFromGlobPatterns(filePathList)
 
 		for _, result := range resultList {
-			fmt.Println(result)
+			utils.InfoLn(result)
 		}
 
-		fmt.Println("findFiles End")
+		utils.DebugLn("findFiles End")
 	},
 }
 

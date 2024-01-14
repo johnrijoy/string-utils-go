@@ -4,8 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
 	"example.com/user/string-utils/app"
 	"example.com/user/string-utils/utils"
 	"github.com/spf13/cobra"
@@ -18,21 +16,21 @@ var findAllCmd = &cobra.Command{
 	Long:  `Find all lines that match the given pattern in multiple files`,
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("findAll called")
+		utils.DebugLn("findAll called")
 
 		regexExp := args[0]
 		filePath := args[1]
 
 		if isInputPathFileMode {
-			fmt.Println("File Path Mode: Input Path File")
+			utils.DebugLn("File Path Mode: Input Path File")
 			filePathList = utils.ReadInputPathFile(filePath)
 		} else {
-			fmt.Println("File Path Mode: Single")
+			utils.DebugLn("File Path Mode: Single")
 			filePathList = append(filePathList, filePath)
 		}
 
-		fmt.Println("Regex: ", regexExp)
-		fmt.Println("Path: ", filePathList)
+		utils.InfoLn("Regex: ", regexExp)
+		utils.InfoLn("Path: ", filePathList)
 
 		// resultList := app.FindAllFromFile(regexExp, filePath)
 		if !submatchFlag {
@@ -43,7 +41,7 @@ var findAllCmd = &cobra.Command{
 			utils.PrintSubmatchMap(resultList)
 		}
 
-		fmt.Println("findAll End")
+		utils.DebugLn("findAll End")
 	},
 }
 
