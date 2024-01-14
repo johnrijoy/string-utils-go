@@ -77,11 +77,15 @@ func ReadInputPathFile(inputFile string) []string {
 
 func filterFiles(pathList []string) (resultList []string) {
 	for _, pathName := range pathList {
-		fileInfo, err := os.Stat(pathName)
+		fileInfo, err := os.Lstat(pathName)
 		HandlePanic(err)
 
+		// check if file is not a directory
 		if !fileInfo.IsDir() {
-			resultList = append(resultList, pathName)
+			// Check if file is a symlink, will return error if not
+			if _, err = os.Readlink(pathName); err != nil {
+				resultList = append(resultList, pathName)
+			}
 		}
 	}
 
