@@ -1,8 +1,6 @@
 package utils
 
-import (
-	"fmt"
-)
+import "strings"
 
 func PrintOccurenceMap(resultList map[string][]string) {
 	for key := range resultList {
@@ -15,10 +13,11 @@ func PrintSubmatchMap(resultList map[string][][]string) {
 	for key := range resultList {
 		InfoLn("file: ", key)
 		for _, matches := range resultList[key] {
-			for _, match := range matches {
-				Info(match + " ")
-			}
-			InfoLn()
+			fullLine := matches[0]
+			subMatches := strings.Join(matches[1:], " ")
+
+			InfoLn(fullLine)
+			InfoLn(subMatches)
 		}
 	}
 }
@@ -26,7 +25,7 @@ func PrintSubmatchMap(resultList map[string][][]string) {
 func PrintOccurenceList(resultList []string) {
 
 	for _, occur := range resultList {
-		fmt.Println(occur)
+		InfoLn(occur)
 	}
 
 }
