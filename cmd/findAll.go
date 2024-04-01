@@ -42,10 +42,10 @@ var findAllCmd = &cobra.Command{
 
 		if !submatchFlag {
 			resultList := findMatch(regexExp, filePathList)
-			utils.PrintOccurenceMap(resultList)
+			app.PrintOccurenceMap(resultList)
 		} else {
 			resultList := findSubMatch(regexExp, filePathList)
-			utils.PrintSubmatchMap(resultList)
+			app.PrintSubmatchMap(resultList)
 		}
 
 		utils.DebugLn("findAll End")

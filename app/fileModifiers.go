@@ -17,14 +17,28 @@ func RenameFiles(basePath, filePattern, newFileNamePattern string) error {
 	r, err := regexp.Compile(filePattern)
 	utils.HandlePanic(err)
 
-	for _, fileName := range fileList {
-		newFileName := r.ReplaceAllString(fileName, newFileNamePattern)
-		if err := RenameFile(basePath, fileName, newFileName); err != nil {
-			return err
-		}
+	renameMap := make(map[string]string)
 
+	for _, fileName := range fileList {
+		if r.MatchString(fileName) {
+			newFileName := r.ReplaceAllString(fileName, newFileNamePattern)
+			renameMap[fileName] = newFileName
+		}
 	}
 
+	PrintRenameMap(renameMap)
+
+	if !TestPrompt("Do you want to continue with the rename?", false) {
+		utils.InfoLn("Rename cancelled...")
+		return nil
+	}
+
+	for fileName := range renameMap {
+		if err := RenameFile(basePath, fileName, renameMap[fileName]); err != nil {
+			return err
+		}
+	}
+	utils.InfoLn("Rename successful...")
 	return nil
 }
 

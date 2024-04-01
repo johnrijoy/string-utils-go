@@ -40,10 +40,10 @@ var replaceAllCmd = &cobra.Command{
 
 		if !submatchFlag {
 			resultList := app.ReplaceAllInGlobPatterns(regexExp, filePathList, replaceText, isTemplateMode)
-			utils.PrintOccurenceMap(resultList)
+			app.PrintOccurenceMap(resultList)
 		} else {
 			resultList := app.ReplaceAllSubmatchesInGlobPatterns(regexExp, filePathList, replaceText, isTemplateMode)
-			utils.PrintSubmatchMap(resultList)
+			app.PrintChangeMap(resultList)
 		}
 
 		utils.DebugLn("replaceAll End")

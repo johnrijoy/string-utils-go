@@ -13,7 +13,7 @@ import (
 
 // renameFilesCmd represents the renameFiles command
 var renameFilesCmd = &cobra.Command{
-	Use:   "renameFiles basePath regexFile newfileName",
+	Use:   "renameFiles [basePath] regexFile newfileName",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -39,6 +39,10 @@ to quickly create a Cobra application.`,
 			filePattern = args[0]
 			newFileName = args[1]
 		}
+
+		utils.InfoLn("Base path:", basePath)
+		utils.InfoLn("File pattern:", filePattern)
+		utils.InfoLn("File name template:", newFileName)
 
 		if err := app.RenameFiles(basePath, filePattern, newFileName); err != nil {
 			utils.HandleExit(err)
