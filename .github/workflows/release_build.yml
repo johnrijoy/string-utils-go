@@ -2,8 +2,12 @@ name: Release Go project
 
 on:
   push:
+    #branches: '**'
     tags:
       - "*" # triggers only if push new tag version, like `0.8.4` or else
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -28,4 +32,4 @@ jobs:
           version: latest
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GO_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
