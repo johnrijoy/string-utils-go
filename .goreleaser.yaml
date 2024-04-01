@@ -8,6 +8,7 @@ archives:
     # Builds reference which build instances should be archived in this archive.
     builds:
       - default
+      - my-archive
 
     # Archive format.
     #
