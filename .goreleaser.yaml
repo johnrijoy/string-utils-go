@@ -1,20 +1,2 @@
 archives:
-  - #
-    # ID of this archive.
-    #
-    # Default: 'default'
-    id: my-archive
-
-    # Builds reference which build instances should be archived in this archive.
-    builds:
-      - default
-      - my-archive
-
-    # Archive format.
-    #
-    # If format is `binary`, no archives are created and the binaries are instead
-    # uploaded directly.
-    #
-    # Valid options are `tar.gz`, `tgz`, `tar.xz`, `txz`, tar`, `gz`, `zip`, and `binary`.
-    # Default: 'tar.gz'
-    format: binary
+  - format: binary
