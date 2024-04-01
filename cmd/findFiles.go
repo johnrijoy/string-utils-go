@@ -17,8 +17,6 @@ var findFilesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		utils.DebugLn("findFiles called")
 
-		utils.InfoLn("File Pattern: ", filePathList)
-
 		filePath := args[0]
 
 		if isInputPathFileMode {
@@ -28,6 +26,8 @@ var findFilesCmd = &cobra.Command{
 			utils.InfoLn("File Path Mode: Single")
 			filePathList = append(filePathList, filePath)
 		}
+
+		utils.InfoLn("File Pattern: ", filePathList)
 
 		resultList := utils.FindFilesFromGlobPatterns(filePathList)
 

@@ -75,6 +75,25 @@ func ReadInputPathFile(inputFile string) []string {
 	return filePathList
 }
 
+func FindFilesInDir(basePath string) ([]string, error) {
+	files, err := os.ReadDir(basePath)
+	if err != nil {
+		return nil, err
+	}
+
+	var fileList []string
+
+	for _, file := range files {
+		if !file.IsDir() {
+			fileList = append(fileList, file.Name())
+		}
+	}
+
+	return fileList, nil
+}
+
+// Internal Funcs
+
 func filterFiles(pathList []string) (resultList []string) {
 	for _, pathName := range pathList {
 		fileInfo, err := os.Lstat(pathName)

@@ -13,6 +13,7 @@ import (
 var (
 	debugMode           bool
 	submatchFlag        bool
+	lineNumberFlag      bool
 	isInputPathFileMode bool
 	filePathList        []string
 	outputFilePath      string

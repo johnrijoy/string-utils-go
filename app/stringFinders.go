@@ -1,10 +1,11 @@
 package app
 
 import (
-	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"regexp"
+	"sync"
 
 	"example.com/user/string-utils/utils"
 )
@@ -32,21 +33,32 @@ func FindAllFromGlobPattern(regexExp string, globPatterns []string) (occurrenceM
 	utils.HandlePanic(err)
 
 	occurrenceMap = make(map[string][]string)
+	var (
+		wg    sync.WaitGroup
+		mutex sync.Mutex
+	)
 
 	for _, fileName := range fileNamesList {
+		wg.Add(1)
 
-		var occurrenceList []string
+		go func(fileName string) {
+			var occurrenceList []string
 
-		file, err := os.ReadFile(fileName)
-		utils.HandlePanic(err)
+			file, err := os.ReadFile(fileName)
+			utils.HandlePanic(err)
 
-		occurrenceList = findMatches(r, file, occurrenceList)
+			occurrenceList = findMatches(r, file, occurrenceList)
 
-		if len(occurrenceList) != 0 {
-			occurrenceMap[fileName] = occurrenceList
-		}
+			if len(occurrenceList) != 0 {
+				mutex.Lock()
+				occurrenceMap[fileName] = occurrenceList
+				mutex.Unlock()
+			}
+			wg.Done()
+		}(fileName)
 	}
 
+	wg.Wait()
 	return
 }
 
@@ -58,21 +70,29 @@ func FindAllLinesFromGlobPattern(regexExp string, globPatterns []string) (occurr
 	utils.HandlePanic(err)
 
 	occurrenceMap = make(map[string][]string)
+	var waitGroup sync.WaitGroup
+	var mutex sync.Mutex
 
-	for _, fileName := range fileNamesList {
+	for _, fileN := range fileNamesList {
+		waitGroup.Add(1)
 
-		var occurrenceList []string
+		go func(fileName string) {
+			var occurrenceList []string
 
-		file, err := os.Open(fileName)
-		utils.HandlePanic(err)
+			file, err := os.ReadFile(fileName)
+			utils.HandlePanic(err)
 
-		occurrenceList = findLineMatches(r, file, occurrenceList)
+			occurrenceList = findLineMatches(r, file, occurrenceList)
 
-		if len(occurrenceList) != 0 {
-			occurrenceMap[fileName] = occurrenceList
-		}
+			if len(occurrenceList) != 0 {
+				mutex.Lock()
+				occurrenceMap[fileName] = occurrenceList
+				mutex.Unlock()
+			}
+			waitGroup.Done()
+		}(fileN)
 	}
-
+	waitGroup.Wait()
 	return
 }
 
@@ -86,20 +106,30 @@ func FindAllSubmatchFromGlobPattern(regexExp string, globPatterns []string) map[
 	utils.HandlePanic(err)
 
 	occurrenceMap := make(map[string][][]string)
+	var (
+		wg    sync.WaitGroup
+		mutex sync.Mutex
+	)
 
 	for _, fileName := range fileNamesList {
+		wg.Add(1)
 
-		var occurrenceList [][]string
+		go func(fileName string) {
+			var occurrenceList [][]string
 
-		file, err := os.ReadFile(fileName)
-		utils.HandlePanic(err)
+			file, err := os.ReadFile(fileName)
+			utils.HandlePanic(err)
 
-		occurrenceList = findSubmatches(r, file, occurrenceList)
-		if len(occurrenceList) != 0 {
-			occurrenceMap[fileName] = occurrenceList
-		}
+			occurrenceList = findSubmatches(r, file, occurrenceList)
+			if len(occurrenceList) != 0 {
+				mutex.Lock()
+				occurrenceMap[fileName] = occurrenceList
+				mutex.Unlock()
+			}
+			wg.Done()
+		}(fileName)
 	}
-
+	wg.Wait()
 	return occurrenceMap
 }
 
@@ -116,7 +146,7 @@ func FindAllLinesSubmatchFromGlobPattern(regexExp string, globPatterns []string)
 
 		var occurrenceList [][]string
 
-		file, err := os.Open(fileName)
+		file, err := os.ReadFile(fileName)
 		utils.HandlePanic(err)
 
 		occurrenceList = findLineSubmatches(r, file, occurrenceList)
@@ -138,20 +168,17 @@ func findMatches(r *regexp.Regexp, file []byte, occurrenceList []string) []strin
 	return occurrenceList
 }
 
-func findLineMatches(r *regexp.Regexp, file *os.File, occurrenceList []string) []string {
-	fileScanner := bufio.NewScanner(file)
-
-	line := 1
-	for fileScanner.Scan() {
-		allOccur := r.FindAll(fileScanner.Bytes(), -1)
-
-		for _, occur := range allOccur {
-			modifOccur := fmt.Sprintf("%2d: %s", line, string(occur))
+func findLineMatches(r *regexp.Regexp, file []byte, occurrenceList []string) []string {
+	allLoc := r.FindAllIndex(file, -1)
+	const newLineByte = '\n'
+	for _, loc := range allLoc {
+		utils.DebugLn("Index: ", loc)
+		if len(loc) == 2 {
+			count := bytes.Count(file[:loc[0]], []byte{newLineByte})
+			modifOccur := fmt.Sprintf("%2d: %s", count+1, string(file[loc[0]:loc[1]]))
 			occurrenceList = append(occurrenceList, modifOccur)
 		}
-		line++
 	}
-
 	return occurrenceList
 }
 
@@ -168,26 +195,65 @@ func findSubmatches(r *regexp.Regexp, file []byte, occurrenceList [][]string) []
 	return occurrenceList
 }
 
-func findLineSubmatches(r *regexp.Regexp, file *os.File, occurrenceList [][]string) [][]string {
-	fileScanner := bufio.NewScanner(file)
+func findLineSubmatches(r *regexp.Regexp, file []byte, occurrenceList [][]string) [][]string {
+	allLoc := r.FindAllSubmatchIndex(file, -1)
+	const newLineByte = '\n'
 
-	line := 1
-	for fileScanner.Scan() {
-		allMatches := r.FindAllSubmatch(fileScanner.Bytes(), -1)
+	for _, loc := range allLoc {
 
-		for _, match := range allMatches {
+		utils.DebugLn("Index: ", loc)
+		if len(loc) > 0 && len(loc)%2 == 0 {
+
+			count := bytes.Count(file[:loc[0]], []byte{newLineByte})
+			firstOccur := fmt.Sprintf("%2d: %s", count+1, string(file[loc[0]:loc[1]]))
+
 			var matchList []string
-			for _, occur := range match {
-				matchList = append(matchList, string(occur))
+			matchList = append(matchList, firstOccur)
+
+			for i := 2; i < len(loc); i += 2 {
+				matchList = append(matchList, string(file[loc[i]:loc[i+1]]))
 			}
 
-			fullLine := matchList[0]
-			modifLine := fmt.Sprintf("%2d: %s", line, fullLine)
-			matchList[0] = modifLine
 			occurrenceList = append(occurrenceList, matchList)
-
 		}
-		line++
 	}
+
 	return occurrenceList
+}
+
+func findAllHelper[T []any](regexExp string, globPatterns []string, matcherFinder func(r *regexp.Regexp, file []byte, occurrenceList T) T) map[string]T {
+	fileNamesList := utils.FindFilesFromGlobPatterns(globPatterns)
+
+	r, err := regexp.Compile(regexExp)
+	utils.HandlePanic(err)
+
+	occurrenceMap := make(map[string]T)
+	var (
+		wg    sync.WaitGroup
+		mutex sync.Mutex
+	)
+
+	for _, fileName := range fileNamesList {
+		wg.Add(1)
+
+		go func(fileName string) {
+			var occurrenceList T
+
+			file, err := os.ReadFile(fileName)
+			utils.HandlePanic(err)
+
+			occurrenceList = matcherFinder(r, file, occurrenceList)
+
+			if len(occurrenceList) != 0 {
+				mutex.Lock()
+				occurrenceMap[fileName] = occurrenceList
+				mutex.Unlock()
+			}
+			wg.Done()
+		}(fileName)
+	}
+
+	wg.Wait()
+
+	return occurrenceMap
 }

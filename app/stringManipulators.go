@@ -51,12 +51,6 @@ func ReplaceAllInGlobPattern(regexExp, globPattern, replaceText string, template
 		file, err := os.ReadFile(fileName)
 		utils.HandlePanic(err)
 
-		occurrenceList = findMatches(r, file, occurrenceList)
-
-		if len(occurrenceList) != 0 {
-			occurrenceMap[fileName] = occurrenceList
-		}
-
 		if templateMode {
 			replaceTemplate, err := os.ReadFile(replaceText)
 			utils.HandlePanic(err)
@@ -71,6 +65,13 @@ func ReplaceAllInGlobPattern(regexExp, globPattern, replaceText string, template
 
 		err = os.WriteFile(fileName, newFile, 0644)
 		utils.HandlePanic(err)
+
+		// collect changes
+		occurrenceList = findMatches(r, file, occurrenceList)
+
+		if len(occurrenceList) != 0 {
+			occurrenceMap[fileName] = occurrenceList
+		}
 	}
 
 	return

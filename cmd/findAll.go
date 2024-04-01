@@ -33,11 +33,18 @@ var findAllCmd = &cobra.Command{
 		utils.InfoLn("Path: ", filePathList)
 
 		// resultList := app.FindAllFromFile(regexExp, filePath)
+		findMatch := app.FindAllFromGlobPattern
+		findSubMatch := app.FindAllSubmatchFromGlobPattern
+		if lineNumberFlag {
+			findMatch = app.FindAllLinesFromGlobPattern
+			findSubMatch = app.FindAllLinesSubmatchFromGlobPattern
+		}
+
 		if !submatchFlag {
-			resultList := app.FindAllFromGlobPattern(regexExp, filePathList)
+			resultList := findMatch(regexExp, filePathList)
 			utils.PrintOccurenceMap(resultList)
 		} else {
-			resultList := app.FindAllSubmatchFromGlobPattern(regexExp, filePathList)
+			resultList := findSubMatch(regexExp, filePathList)
 			utils.PrintSubmatchMap(resultList)
 		}
 
@@ -51,4 +58,5 @@ func init() {
 	// Flags and configuration settings
 
 	findAllCmd.Flags().BoolVarP(&submatchFlag, "submatch", "s", false, "Enable capture groups")
+	findAllCmd.Flags().BoolVarP(&lineNumberFlag, "lineNumber", "l", false, "Enable line number")
 }

@@ -17,8 +17,8 @@ var (
 
 func init() {
 	InfoLogger = log.New(os.Stdout, "", 0)
-	DebugLogger = log.New(os.Stdout, "[DEBUG] ", log.Ldate|log.Ltime)
-	ErrorLogger = log.New(os.Stderr, "[ERROR] ", log.Ldate|log.Ltime)
+	DebugLogger = log.New(os.Stdout, "[DEBUG] ", log.Ldate|log.Ltime|log.Lmsgprefix)
+	ErrorLogger = log.New(os.Stderr, "[ERROR] ", log.Ldate|log.Ltime|log.Lmsgprefix)
 }
 
 func PreRun(debugMode *bool) func(*cobra.Command, []string) {
