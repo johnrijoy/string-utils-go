@@ -22,7 +22,7 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:               "string-utils",
-	Version:           "0.1.0-beta",
+	Version:           "0.1.0-beta.1",
 	Short:             "A utility for manipulating strings inside files",
 	Long:              `Contains common utility functions for maniupulating strings in mutliple files`,
 	PersistentPreRun:  utils.PreRun(&debugMode),
