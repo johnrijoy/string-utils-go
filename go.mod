@@ -3,7 +3,7 @@ module example.com/user/string-utils
 go 1.20
 
 require (
-	github.com/bmatcuk/doublestar v1.3.4
+	github.com/bmatcuk/doublestar/v4 v4.6.1
 	github.com/spf13/cobra v1.8.0
 )
 

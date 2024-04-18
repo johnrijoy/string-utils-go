@@ -7,26 +7,31 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bmatcuk/doublestar"
+	"github.com/bmatcuk/doublestar/v4"
 )
 
 func FindFilesFromGlobPattern(globPattern string) (fileList []string) {
 
 	DebugLn("GlobPattern: ", globPattern)
-	fileList, err := doublestar.Glob(globPattern)
+	globPattern = filepath.ToSlash(globPattern)
+	basepath, pattern := doublestar.SplitPattern(globPattern)
+	fsys := os.DirFS(basepath)
+	fileList, err := doublestar.Glob(fsys, pattern, doublestar.WithFilesOnly(), doublestar.WithNoFollow())
 	HandlePanic(err)
 
 	DebugLn("Files: ", fileList)
 
-	fileList = filterFiles(fileList)
+	//fileList = filterFiles(fileList)
+
+	fileList = prefixBasePath(fileList, basepath)
 
 	return
 }
 
 func FindFilesFromGlobPatterns(globPatterns []string) (fileList []string) {
 
-	for _, glglobPattern := range globPatterns {
-		fileList = append(fileList, FindFilesFromGlobPattern(glglobPattern)...)
+	for _, globPattern := range globPatterns {
+		fileList = append(fileList, FindFilesFromGlobPattern(globPattern)...)
 	}
 
 	return
@@ -93,6 +98,13 @@ func FindFilesInDir(basePath string) ([]string, error) {
 }
 
 // Internal Funcs
+
+func prefixBasePath(fileList []string, basepath string) []string {
+	for i, relPath := range fileList {
+		fileList[i] = filepath.Join(basepath, relPath)
+	}
+	return fileList
+}
 
 func filterFiles(pathList []string) (resultList []string) {
 	for _, pathName := range pathList {
