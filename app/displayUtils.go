@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"example.com/user/string-utils/utils"
+	"github.com/johnrijoy/string-utils-go/utils"
 )
 
 func PrintOccurenceMap(resultList map[string]MatchResult) {

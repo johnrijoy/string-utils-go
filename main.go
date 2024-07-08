@@ -1,10 +1,9 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 Rijoy John <johnrijoy@gmail.com>
 */
 package main
 
-import "example.com/user/string-utils/cmd"
+import "github.com/johnrijoy/string-utils-go/cmd"
 
 func main() {
 	cmd.Execute()

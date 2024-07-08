@@ -1,4 +1,4 @@
-module example.com/user/string-utils
+module github.com/johnrijoy/string-utils-go
 
 go 1.20
 

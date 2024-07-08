@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"example.com/user/string-utils/utils"
+	"github.com/johnrijoy/string-utils-go/utils"
 )
 
 func RenameFiles(basePath, filePattern, newFileNamePattern string) error {

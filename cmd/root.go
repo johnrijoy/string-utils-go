@@ -6,7 +6,7 @@ package cmd
 import (
 	"os"
 
-	"example.com/user/string-utils/utils"
+	"github.com/johnrijoy/string-utils-go/utils"
 	"github.com/spf13/cobra"
 )
 

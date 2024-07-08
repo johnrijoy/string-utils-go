@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"example.com/user/string-utils/utils"
+	"github.com/johnrijoy/string-utils-go/utils"
 )
 
 type ChangeResult struct {

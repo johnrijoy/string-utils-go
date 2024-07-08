@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"sync"
 
-	"example.com/user/string-utils/utils"
+	"github.com/johnrijoy/string-utils-go/utils"
 )
 
 type Matches interface {
